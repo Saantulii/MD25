@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asignación de Manzaneros</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: left;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .close {
+            float: right;
+            cursor: pointer;
+        }
+        .grupos {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .grupo {
+            border: 1px solid black;
+            padding: 10px;
+            margin: 5px;
+            width: 50%;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>Asignar Manzaneros a Misioneros</h1>
+    
+    <div>
+        <h3>Nombres de Manzaneros</h3>
+        <textarea id="nombresManzaneros" placeholder="Ingresa los nombres de los manzaneros separados por comas"></textarea>
+    </div>
+    
+    <div>
+        <h3>Nombres de Misioneros</h3>
+        <textarea id="nombresMisioneros" placeholder="Ingresa los nombres de los misioneros separados por comas"></textarea>
+    </div>
+    
+    <button onclick="asignarGrupos()">Asignar Grupos</button>
+    
+    <div id="modal" class="modal" tabindex="-1">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarModal()">&times;</span>
+            <h2>Grupos Formados</h2>
+            <div id="grupos" class="grupos"></div>
+            <button onclick="copiarTexto()">Copiar</button>
+        </div>
+    </div>
+    
+    <script>
+        function asignarGrupos() {
+            let manzaneros = document.getElementById('nombresManzaneros').value.split(',').map(name => name.trim());
+            let misioneros = document.getElementById('nombresMisioneros').value.split(',').map(name => name.trim());
+            let gruposContainer = document.getElementById('grupos');
+            gruposContainer.innerHTML = '';
+            
+            if (manzaneros.length === 0 || misioneros.length === 0 || manzaneros[0] === "" || misioneros[0] === "") {
+                alert("Por favor, ingresa nombres válidos.");
+                return;
+            }
+            
+            misioneros = misioneros.sort(() => Math.random() - 0.5); // Mezclar aleatoriamente los misioneros
+            let ratio = Math.ceil(misioneros.length / manzaneros.length);
+            
+            manzaneros.forEach((manzanero, index) => {
+                let grupoMisioneros = misioneros.slice(index * ratio, (index + 1) * ratio);
+                if (grupoMisioneros.length > 0) {
+                    let grupoDiv = document.createElement('div');
+                    grupoDiv.classList.add('grupo');
+                    grupoDiv.innerHTML = `<strong>${manzanero}</strong><br>${grupoMisioneros.join('<br>')}`;
+                    gruposContainer.appendChild(grupoDiv);
+                }
+            });
+            
+            let modal = document.getElementById('modal');
+            modal.style.display = 'flex';
+            modal.focus();
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        function copiarTexto() {
+            let text = document.getElementById('grupos').innerText;
+            navigator.clipboard.writeText(text);
+            alert('Texto copiado');
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === "Escape") {
+                cerrarModal();
+            }
+        });
+    </script>
+</body>
+</html>
